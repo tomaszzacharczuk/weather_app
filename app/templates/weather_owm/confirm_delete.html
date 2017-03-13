@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{{ super() }} - Delete Location{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Delete Location</h1>
+</div>
+<div class="col-md-4">
+    <p>Are you sure, you want to delete {{ location.name }}?</p>
+    <a class="btn btn-md btn-primary" href="{{ url_for('weather_owm.locations') }}">Cancel</a>
+    {{ wtf.quick_form(form) }}
+</div>
+{% endblock %}

@@ -14,6 +14,12 @@ class Role(db.Model):
     users = db.relationship('User', backref='role')
 
 
+user_locations = db.Table('user_locations',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('location_id', db.Integer, db.ForeignKey('locations.id'))
+)
+
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -22,6 +28,11 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
     avatar_hash = db.Column(db.String(32))
+    locations = db.relationship('Location',
+                                secondary=user_locations,
+                                backref=db.backref('users', lazy='dynamic'),
+                                lazy='dynamic'
+    )
 
     @property
     def password(self):
@@ -107,3 +118,20 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def user_loader(user_id):
     return User.query.get(int(user_id))
+
+
+class Location(db.Model):
+    __tablename__ = 'locations'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    weather = db.relationship('Weather', backref="weather")
+
+
+class Weather(db.Model):
+    __tablename__ = 'weathers'
+    id = db.Column(db.Integer, primary_key=True)
+    temperature = db.Column(db.Float)
+    temperature_min = db.Column(db.Float)
+    temperature_max = db.Column(db.Float)
+    wind = db.Column(db.Float)
+    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
