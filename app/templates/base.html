@@ -1,61 +1,93 @@
 {% extends "bootstrap/base.html" %}
 
+{% block styles %}
+{{ super() }}
+<link href="{{ url_for('static', filename='css/sb-admin.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/plugins/morris.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+{% endblock %}
 {% block title %}Weather App{% endblock %}
 
 
 {% block navbar %}
-<div class="navbar navbar-inverse" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">Weather App</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                {% if current_user.is_authenticated %}
-                <li><a href="{# url_for('main.user', username=current_user.username) #}">Profile</a></li>
-                {% endif %}
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                {% if current_user.is_authenticated %}
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="{{ current_user.gravatar(size=18) }}">
-                        Account <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
-                        <li><a href="{{ url_for('auth.change_email_request') }}">Change Email</a></li>
-                        <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
-                    </ul>
-                </li>
-                {% else %}
-                <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
-                {% endif %}
-            </ul>
-        </div>
+<!-- Navigation -->
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">Weather App</a>
     </div>
-</div>
+    <!-- Top Menu Items -->
+    <ul class="nav navbar-right top-nav">
+        {% if current_user.is_authenticated %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="{{ current_user.gravatar(size=18) }}"> {{ current_user.username }} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li><a href="#"><i class="fa fa-fw fa-user"></i> Profile (TODO)</a></li>
+                <li><a href="{{ url_for('auth.change_password') }}"><i class="fa fa-fw fa-key"></i> Change Password</a></li>
+                <li><a href="{{ url_for('auth.change_email_request') }}"><i class="fa fa-fw fa-envelope"></i> Change Email</a></li>
+                <li class="divider"></li>
+                <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+            </ul>
+        </li>
+        {% else %}
+        <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
+        {% endif %}
+    </ul>
+
+    <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav side-nav">
+            <li {% if request.url_rule.endpoint == "main.dashboard" %}class="active"{% endif %}>
+                <a href="{{ url_for('main.dashboard') }}"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
+            </li>
+            <li>
+                <a href="charts.html"><i class="fa fa-fw fa-globe"></i> Locations</a>
+            </li>
+            <li>
+                <a href="tables.html"><i class="fa fa-fw fa-rocket"></i> API</a>
+            </li>
+        </ul>
+    </div>
+    <!-- /.navbar-collapse -->
+</nav>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    {% for message in get_flashed_messages() %}
-    <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        {{ message }}
-    </div>
-    {% endfor %}
+<div id="wrapper">
+    <div id="page-wrapper" class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+        </div>
+        {% endfor %}
 
-    {% block page_content %}{% endblock %}
+        {% block page_content %}
+
+        {% endblock %}
+    </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
+
+<!-- Morris Charts JavaScript -->
+<script src="{{ url_for('static', filename="js/plugins/morris/raphael.min.js") }}"></script>
+<script src="{{ url_for('static', filename="js/plugins/morris/morris.min.js") }}"></script>
+<script src="{{ url_for('static', filename="js/plugins/morris/morris-data.js") }}"></script>
+
+<!-- Flot Charts JavaScript -->
+<!--[if lte IE 8]><script src="{{ url_for('static', filename="js/excanvas.min.js") }}"></script><![endif]-->
+<script src="{{ url_for('static', filename="js/plugins/flot/jquery.flot.js") }}"></script>
+<script src="{{ url_for('static', filename="js/plugins/flot/jquery.flot.tooltip.min.js") }}"></script>
+<script src="{{ url_for('static', filename="js/plugins/flot/jquery.flot.resize.js") }}"></script>
+<script src="{{ url_for('static', filename="js/plugins/flot/jquery.flot.pie.js") }}"></script>
+<script src="{{ url_for('static', filename="js/plugins/flot/flot-data.js") }}"></script>
 {% endblock %}
