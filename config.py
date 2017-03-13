@@ -31,7 +31,7 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('WEATHER_APP_TEST_DB')
 
 
-class ProductionConfig:
+class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('WEATHER_APP_PROD_DB')
 
 
