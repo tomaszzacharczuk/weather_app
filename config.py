@@ -2,7 +2,7 @@ import os
 
 
 class Config:
-    # Pull SECRET_KEY from environment variable, if not set use default one
+    # Pull SECRET_KEY from environment variable, as God meant it to be :)
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
@@ -15,6 +15,8 @@ class Config:
     WEATHER_APP_MAIL_SUBJECT_PREFIX = '[WEATHER_APP]'
     WEATHER_APP_MAIL_SENDER = 'WEATHER_APP Admin <weather_app@example.com>'
     WEATHER_APP_ADMIN = os.environ.get('WEATHER_APP_ADMIN')
+
+    OWM_API_KEY = os.environ.get('OWM_API_KEY')
 
     @staticmethod
     def init_app(app):

@@ -1,4 +1,5 @@
 from flask import render_template
+from flask_login import current_user, login_required
 from . import main
 
 
@@ -8,5 +9,7 @@ def index():
 
 
 @main.route('/dashboard')
+@login_required
 def dashboard():
-    return render_template('dashboard.html')
+    locations = current_user.locations.all()
+    return render_template('dashboard.html', locations=locations)

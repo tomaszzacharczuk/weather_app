@@ -1,8 +1,8 @@
-from . import db
+from datetime import datetime
 from flask import current_app, request
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import login_manager
+from . import login_manager, db
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 import hashlib
 
@@ -10,7 +10,7 @@ import hashlib
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True)
+    name = db.Column(db.String(64), unique=True, nullable=False)
     users = db.relationship('User', backref='role')
 
 
@@ -23,11 +23,11 @@ user_locations = db.Table('user_locations',
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(64), unique=True, index=True)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    password_hash = db.Column(db.String(128))
+    email = db.Column(db.String(64), unique=True, index=True, nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
     confirmed = db.Column(db.Boolean, default=False)
-    avatar_hash = db.Column(db.String(32))
+    avatar_hash = db.Column(db.String(32), nullable=True)
     locations = db.relationship('Location',
                                 secondary=user_locations,
                                 backref=db.backref('users', lazy='dynamic'),
@@ -123,15 +123,34 @@ def user_loader(user_id):
 class Location(db.Model):
     __tablename__ = 'locations'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True)
-    weather = db.relationship('Weather', backref="weather")
+    name = db.Column(db.String(64), unique=True, nullable=False)
+    weather = db.relationship('Weather', backref="location")
 
 
 class Weather(db.Model):
     __tablename__ = 'weathers'
     id = db.Column(db.Integer, primary_key=True)
-    temperature = db.Column(db.Float)
-    temperature_min = db.Column(db.Float)
-    temperature_max = db.Column(db.Float)
-    wind = db.Column(db.Float)
+    temperature = db.Column(db.Float, nullable=False)
+    temperature_min = db.Column(db.Float, nullable=False)
+    temperature_max = db.Column(db.Float, nullable=False)
+    wind = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime(), default=datetime.utcnow)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+
+    @property
+    def serialize_temperature(self):
+        """Return object data in serializable format"""
+        return {
+            'temperature_min': self.temperature_min,
+            'temperature': self.temperature,
+            'temperature_max': self.temperature_max,
+            'date': "{:%Y-%m-%d %H:%M}".format(self.date)
+        }
+
+    @property
+    def serialize_wind(self):
+        """Return object data in serializable format"""
+        return {
+            'wind': self.wind,
+            'date': "{:%Y-%m-%d %H:%M}".format(self.date)
+        }

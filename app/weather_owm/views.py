@@ -1,5 +1,5 @@
-from flask import render_template, flash, redirect, url_for
-from flask_login import current_user
+from flask import render_template, flash, redirect, url_for, jsonify
+from flask_login import current_user, login_required
 from ..models import Location
 from .. import db
 from . import weather_owm
@@ -7,6 +7,7 @@ from .forms import LocationForm, DeleteLocationForm
 
 
 @weather_owm.route('/locations/add', methods=['GET', 'POST'])
+@login_required
 def add():
     """Add or Edit location"""
     form = LocationForm()
@@ -22,6 +23,7 @@ def add():
 
 
 @weather_owm.route('/locations/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit(id):
     form = LocationForm()
     location = Location.query.get(id)
@@ -42,6 +44,7 @@ def edit(id):
 
 
 @weather_owm.route('/locations/delete/<int:id>', methods=['GET', 'POST'])
+@login_required
 def delete(id):
     delete_form = DeleteLocationForm()
     location = Location.query.get(id)
@@ -60,6 +63,40 @@ def delete(id):
 
 
 @weather_owm.route('/locations')
+@login_required
 def locations():
     locations = current_user.locations.all()
     return render_template('weather_owm/locations.html', locations=locations)
+
+
+@weather_owm.route('/_graph/get_temperature/<int:location_id>')
+@login_required
+def _get_temperature(location_id):
+    location = current_user.locations.filter_by(id=location_id).first()
+    if not location:
+        return jsonify({})
+    data = [w.serialize_temperature for w in location.weather]
+
+    return jsonify({
+        'element': 'location-temp-' + str(location_id),
+        'data': data,
+        'xkey': 'date',
+        'ykeys': ['temperature_min', 'temperature', 'temperature_max'],
+        'labels': ['Min Temp', 'Med Temp', 'Max Temp'],
+    })
+
+
+@weather_owm.route('/_graph/get_wind/<int:location_id>')
+@login_required
+def _get_wind(location_id):
+    location = current_user.locations.filter_by(id=location_id).first()
+    if not location:
+        return jsonify({})
+    data = [w.serialize_wind for w in location.weather]
+    return jsonify({
+        'element': 'location-wind-' + str(location_id),
+        'data': data,
+        'xkey': 'date',
+        'ykeys': ['wind'],
+        'labels': ['Wind'],
+    })
