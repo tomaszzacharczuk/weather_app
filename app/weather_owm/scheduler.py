@@ -21,16 +21,17 @@ def collect_weather():
     with app.app_context():
         owm = pyowm.OWM(app.config['OWM_API_KEY'])
         locations = Location.query.all()
+        # TODO: Instead of loop, use bulk pull by city ID from API
         for location in locations:
-            w = owm.weather_at_place(location.name)
-            temperature = w.get_weather().get_temperature('celsius')
-            wind = w.get_weather().get_wind()
+            w = owm.weather_at_place(location.name).get_weather()
+            temperature = w.get_temperature('celsius')
+            wind = w.get_wind()
             weather = Weather(
                 temperature=temperature['temp'],
                 temperature_min=temperature['temp_min'],
                 temperature_max=temperature['temp_max'],
                 wind=wind['speed'],
-                date=datetime.utcfromtimestamp(w.get_reception_time()),
+                date=datetime.utcfromtimestamp(w.get_reference_time()),
                 location=location
             )
             db.session.add(weather)

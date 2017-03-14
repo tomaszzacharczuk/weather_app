@@ -75,7 +75,7 @@ def _get_temperature(location_id):
     location = current_user.locations.filter_by(id=location_id).first()
     if not location:
         return jsonify({})
-    data = [w.serialize_temperature for w in location.weather]
+    data = [w.serialize_temperature for w in location.weather[:40]]
 
     return jsonify({
         'element': 'location-temp-' + str(location_id),
@@ -92,7 +92,7 @@ def _get_wind(location_id):
     location = current_user.locations.filter_by(id=location_id).first()
     if not location:
         return jsonify({})
-    data = [w.serialize_wind for w in location.weather]
+    data = [w.serialize_wind for w in location.weather[:40]]
     return jsonify({
         'element': 'location-wind-' + str(location_id),
         'data': data,
