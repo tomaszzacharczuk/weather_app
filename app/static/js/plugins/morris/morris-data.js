@@ -6,7 +6,7 @@ $(function() {
         {},
         function(data) {
             if (!data.data.length){
-                $(graph).text('No data collected.');
+                $(graph).text('No data collected yet.');
             } else {
                 Morris.Line(data);
             }
@@ -19,7 +19,7 @@ $(function() {
         {},
         function(data) {
             if (!data.data.length){
-                $(graph).text('No data collected.');
+                $(graph).text('No data collected yet.');
             } else {
                 Morris.Area(data);
             }
