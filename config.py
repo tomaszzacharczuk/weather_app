@@ -25,12 +25,12 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('WEATHER_APP_DEV_DB') or 'postgresql://tom:tom@localhost/weather_app'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('WEATHER_APP_DEV_DB')
 
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('WEATHER_APP_TEST_DB') or 'postgresql://tom:tom@localhost/weather_app_testing'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('WEATHER_APP_TEST_DB')
     WTF_CSRF_ENABLED = False
     PRESERVE_CONTEXT_ON_EXCEPTION = False
 
