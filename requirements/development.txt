@@ -1,0 +1,4 @@
+-r common.txt
+coverage==4.3.4
+httpie==0.7.2
+requests==2.13.0
