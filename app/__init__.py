@@ -34,4 +34,7 @@ def create_app(config_name):
     from .weather_owm import weather_owm as weather_owm_blueprint
     app.register_blueprint(weather_owm_blueprint, url_prefix="/weather")
 
+    from .api_1_0 import api as api_1_0_blueprint
+    app.register_blueprint(api_1_0_blueprint, url_prefix="/api/v1.0")
+
     return app

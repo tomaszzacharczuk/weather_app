@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, jsonify
 from flask_login import current_user, login_required
-from ..models import Location
+from ..models import Location, Weather
 from .. import db
 from . import weather_owm
 from .forms import LocationForm, DeleteLocationForm
@@ -65,7 +65,7 @@ def delete(id):
 @weather_owm.route('/locations')
 @login_required
 def locations():
-    locations = current_user.locations.all()
+    locations = current_user.locations.order_by(Location.name.asc()).all()
     return render_template('weather_owm/locations.html', locations=locations)
 
 
@@ -75,7 +75,7 @@ def _get_temperature(location_id):
     location = current_user.locations.filter_by(id=location_id).first()
     if not location:
         return jsonify({})
-    data = [w.serialize_temperature for w in location.weather[:40]]
+    data = [w.serialize_temperature for w in location.weather.order_by(Weather.date.desc()).limit(40)]
 
     return jsonify({
         'element': 'location-temp-' + str(location_id),
@@ -92,7 +92,7 @@ def _get_wind(location_id):
     location = current_user.locations.filter_by(id=location_id).first()
     if not location:
         return jsonify({})
-    data = [w.serialize_wind for w in location.weather[:40]]
+    data = [w.serialize_wind for w in location.weather.order_by(Weather.date.desc()).limit(40)]
     return jsonify({
         'element': 'location-wind-' + str(location_id),
         'data': data,

@@ -1,10 +1,11 @@
 from datetime import datetime
-from flask import current_app, request
+from flask import current_app, request, url_for
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import login_manager, db
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 import hashlib
+from .exceptions import ValidationError
 
 
 class Role(db.Model):
@@ -15,9 +16,9 @@ class Role(db.Model):
 
 
 user_locations = db.Table('user_locations',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-    db.Column('location_id', db.Integer, db.ForeignKey('locations.id'))
-)
+                          db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+                          db.Column('location_id', db.Integer, db.ForeignKey('locations.id'))
+                          )
 
 
 class User(UserMixin, db.Model):
@@ -32,7 +33,7 @@ class User(UserMixin, db.Model):
                                 secondary=user_locations,
                                 backref=db.backref('users', lazy='dynamic'),
                                 lazy='dynamic'
-    )
+                                )
 
     @property
     def password(self):
@@ -70,10 +71,10 @@ class User(UserMixin, db.Model):
             url = 'https://secure.gravatar.com/avatar'
         else:
             url = 'http://www.gravatar.com/avatar'
-        hash = self.avatar_hash or hashlib.md5(
+        a_hash = self.avatar_hash or hashlib.md5(
             self.email.encode('utf-8')).hexdigest()
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
-            url=url, hash=hash, size=size, default=default, rating=rating)
+            url=url, hash=a_hash, size=size, default=default, rating=rating)
 
     def generate_reset_token(self, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
@@ -114,6 +115,19 @@ class User(UserMixin, db.Model):
         db.session.add(self)
         return True
 
+    def generate_auth_token(self, expiration):
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'id': self.id}).decode('ascii')
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return User.query.get(data['id'])
+
 
 @login_manager.user_loader
 def user_loader(user_id):
@@ -124,7 +138,23 @@ class Location(db.Model):
     __tablename__ = 'locations'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
-    weather = db.relationship('Weather', backref="location")
+    weather = db.relationship('Weather', backref="location", lazy="dynamic")
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'temperature': url_for('api.get_temperature', location_id=self.id, _external=True),
+            'wind': url_for('api.get_wind', location_id=self.id, _external=True)
+        }
+
+    @staticmethod
+    def from_json(json_location):
+        name = json_location.get('name')
+        if name is None:
+            ValidationError('Location is missing attribute "name"')
+        return Location(name=name)
 
 
 class Weather(db.Model):
