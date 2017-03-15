@@ -67,9 +67,7 @@ def get_wind(location_id):
 
 @api.route('/locations/', methods=['POST'])
 def new_location():
-    location = Location.query.filter_by(name=request.json.get('name')).first()
-    if not location:
-        location = Location.from_json(request.json)
+    location = Location.from_json(request.json)
     location.users.append(g.current_user)
     db.session.add(location)
     db.session.commit()
@@ -85,7 +83,7 @@ def edit_location(location_id):
         g.current_user.locations.remove(location)
         location = Location.from_json(request.json)
         location.users.append(g.current_user)
-        db.session.add(current_user)
+        db.session.add(g.current_user)
         db.session.add(location)
     else:
         location.name = request.json.get('name')

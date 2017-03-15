@@ -154,6 +154,9 @@ class Location(db.Model):
         name = json_location.get('name')
         if name is None:
             ValidationError('Location is missing attribute "name"')
+        location = Location.query.filter_by(name=name).first()
+        if location:
+            return location
         return Location(name=name)
 
 

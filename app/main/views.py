@@ -18,5 +18,5 @@ def index():
 @main.route('/dashboard')
 @login_required
 def dashboard():
-    locations = current_user.locations.all()
+    locations = current_user.locations.order_by(Location.name.asc()).all()
     return render_template('dashboard.html', locations=locations)
