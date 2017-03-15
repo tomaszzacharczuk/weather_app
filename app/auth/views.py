@@ -16,6 +16,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
+        if user is None:
+            flash('User with given email does not exist.')
+            return redirect(url_for('auth.login'))
         if not user.confirmed:
             link = '<a href="' + url_for('auth.resend_confirmation', email=form.email.data) + '">resend</a>'
             flash(Markup(
@@ -33,7 +36,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out')
+    flash('You have been logged out.')
     return redirect(url_for('main.index'))
 
 
