@@ -60,7 +60,7 @@ class User(UserMixin, db.Model):
             data = s.loads(token)
         except:
             return False
-        if data.confirm != self.id:
+        if data['confirm']!= self.id:
             return False
         self.confirmed = True
         db.session.add(self)
@@ -138,7 +138,10 @@ class Location(db.Model):
     __tablename__ = 'locations'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
-    weather = db.relationship('Weather', backref="location", lazy="dynamic")
+    weather = db.relationship('Weather',
+                              backref="location",
+                              lazy="dynamic",
+                              cascade='all, delete-orphan')
 
     @property
     def serialize(self):
