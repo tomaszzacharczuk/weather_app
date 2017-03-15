@@ -10,7 +10,7 @@ Examples:
 
 export SECRET_KEY='hard to guess string'<br />
 export WEATHER_APP_DEV_DB='postgresql://user:pass@localhost/weather_app'<br />
-export WEATHER_APP_TEST_DB='postgresql://user:pass@localhost/weather_app' //needed to run unittests<br />
+export WEATHER_APP_TEST_DB='postgresql://user:pass@localhost/weather_app_test' //needed to run unittests<br />
 
 export OWM_API_KEY='cc17b174ba934a330313e87ac5c5597b' //weather API key, copy it<br />
 
