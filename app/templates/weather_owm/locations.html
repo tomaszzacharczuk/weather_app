@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{{ super() }} - Locations{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Locations <a href="{{ url_for('weather_owm.add') }}" class="btn btn-sm btn-primary">Add Location</a></h1>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+        <div class="list-group">
+            {% for location in locations %}
+            <div class="list-group-item">
+                {{ location.name }}
+                <div class="btn-group pull-right">
+                  <a href="{{ url_for('weather_owm.edit', id=location.id) }}" class="btn btn-xs btn-primary">Edit</a>
+                  <a href="{{ url_for('weather_owm.delete', id=location.id) }}" class="btn btn-xs btn-danger">Delete</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

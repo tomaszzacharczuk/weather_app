@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+{% include 'statistics.html' %}
+ <div class="jumbotron">
+
+     {% if current_user.is_authenticated %}<img src="{{ current_user.gravatar(size=100) }}">{% endif %}
+     <h1>
+        Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!
+     </h1>
+     <p>This is your friendly weather app. It can collect weather data for all your favorite locations!</p>
+     {% if not current_user.is_authenticated %}
+     <p>Don't wait, <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg" role="button">Register Now! &raquo;</a>
+         or <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg" role="button">Log in! &raquo;</a></p>
+     {% endif %}
+     {% include 'motto.html' %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% endblock %}

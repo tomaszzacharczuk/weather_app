@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ super() }} - Dashboard{% endblock %}
+{% block page_content %}
+<div class="page-header col-md-12 row-fluid">
+    <h1>Dashboard <small>Charts for all locations.</small></h1>
+</div>
+<div class="col-md-12">
+    {% for location in locations %}
+    <!-- Morris Charts -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h2 class="">{{ location.name }}</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-bar-chart-o"></i> Maximum, Minimum and Median temperature (in Celsius)</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="morris-area-chart-temperature" id="location-temp-{{ location.id }}" data-location_id="{{ location.id }}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-bar-chart-o"></i> Speed of wind (in meter/sec)</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="morris-area-chart-wind" id="location-wind-{{ location.id }}" data-location_id="{{ location.id }}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% endblock %}
