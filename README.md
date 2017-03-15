@@ -5,7 +5,9 @@ Simple Flask app for collecting weather info
 Development environment setup instructions.
 
 1. Set environment variables:
+
 Examples:
+
 export SECRET_KEY='hard to guess string'
 export WEATHER_APP_DEV_DB='postgresql://user:pass@localhost/weather_app'
 export WEATHER_APP_TEST_DB='postgresql://user:pass@localhost/weather_app' //needed to run unittests
