@@ -31,6 +31,8 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('WEATHER_APP_TEST_DB') or 'postgresql://tom:tom@localhost/weather_app_testing'
+    WTF_CSRF_ENABLED = False
+    PRESERVE_CONTEXT_ON_EXCEPTION = False
 
 
 class ProductionConfig(Config):
