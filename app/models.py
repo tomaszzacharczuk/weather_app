@@ -14,6 +14,12 @@ class Role(db.Model):
     name = db.Column(db.String(64), unique=True, nullable=False)
     users = db.relationship('User', backref='role')
 
+    @staticmethod
+    def initiate():
+        if not Role.query.filter_by(name="User").first():
+            role = Role(name="User")
+            db.session.add(role)
+            db.session.commit()
 
 user_locations = db.Table('user_locations',
                           db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
